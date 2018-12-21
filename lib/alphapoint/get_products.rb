@@ -1,39 +1,36 @@
-module AlphaPoint
-	class GetProducts < AlphaPoint
+require 'json'
 
-  		def initialize(address)
-  			super(address)
-  		end
+module Alphapoint
+	class GetProducts
+		@@call_name = 'GetProducts'
 
-		def execute
-			EM.run {
-				@ws.on :open do |event|
-					p [:open]
-	    			payload = {
-	    				"OMSId": 1,
-						"ProductId": 1,
-	    			}
+		attr_accessor :iValue
+		attr_accessor :type
 
-	    			frame = {
-	    				'm': 0,
-	    				'i': 2,
-	    				'n': 'GetProduct',
-	    				'o': payload.to_json
-	    			}
-
-	    			@ws.send(frame.to_json)
-				end
-
-				@ws.on :message do |event|
-	    			p [:message, event.data]
-			  	end
-
-				@ws.on :close do |event|
-				  p [:close, event.code, event.reason]
-				  @ws = nil
-				end
-			}
+		def initialize(payload)
+			@payload = payload
 		end
 
+		# Executes the actual call for GetProducts
+		def mount_frame
+			frame = {
+				'm': @type,
+				'i': @iValue,
+				'n': @@call_name,
+				'o': JSON.generate(@payload)
+			}
+
+			return JSON.generate(frame)
+		end
+
+		def handle_response(data)
+			# p data # This is for debugging only
+
+			if data['m'] == 1 # reply
+				if data['n'] == @@call_name
+					p data
+				end
+			end
+		end
 	end
 end
