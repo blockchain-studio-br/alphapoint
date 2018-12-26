@@ -7,6 +7,7 @@ module Alphapoint
 
 	REQUEST = 0
 	SUBSCRIBE = 2
+	UNSUBSCRIBE = 4
 
 	class Error < StandardError; end
 
@@ -16,20 +17,42 @@ module Alphapoint
 			@address = address
 			@nextIValue = 2
 			@actions = []
+			@unsub_actions = []
 		end
 
 		def register_action(action, type)
 			action.type = type
 			@actions << action
-			EventMachine::stop_event_loop # checar esse comando
+
+			if EM.reactor_running?
+				EM.stop_event_loop # checar esse comando
+			end
+
+			return @actions
 		end
 
+		# Se a ação for de subscribe precisa mandar um unsubscribe pro servidor
 		def drop_actions(condition)
-			map_actions = @actions.select { |action| 
-				action.type != condition.second and action.class.name != condition.first
+
+			mapped_actions = @actions.select { |action| 
+				action.type == condition.second and action.class.name == condition.first
 			}
-			@actions = map_actions
-			EventMachine::stop_event_loop # checar esse comando
+
+			if condition.second == SUBSCRIBE
+				@unsub_actions += mapped_actions
+			end
+
+			@actions -= mapped_actions
+		end
+
+		def drop_action(id)
+			mapped_action = @actions.select { |action| action.iValue != id}
+
+			if mapped_action.type == SUBSCRIBE
+				@unsub_actions += mapped_action
+			end
+
+			@actions -= mapped_action
 		end
 
 		def execute			
@@ -53,6 +76,18 @@ module Alphapoint
 					p [:message]
 					data = JSON.parse(event.data)
 
+					# Check actions that are unsubscribing
+					# And notify the server (ISSO FUNCIONA?)
+					@unsub_actions.each do |action|
+						action.type = UNSUBSCRIBE
+						action.setPayloadNil
+
+						frame = action.mount_frame
+
+						@ws.send(frame)
+					end
+
+
 					received_action = @actions.select { |action| action.iValue == data['i']}
 
 					if !received_action.nil?
@@ -63,7 +98,7 @@ module Alphapoint
 							p "Warning: More than one action with same id were retrieved, only one was treated"
 						end
 					else
-						raise "Error: Received message has no correspondent id"
+						p "Error: Received message has no correspondent id"
 					end
 				end
 

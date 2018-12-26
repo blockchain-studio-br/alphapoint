@@ -11,6 +11,10 @@ module Alphapoint
 			@payload = payload
 		end
 
+		def setPayloadNil
+			@payload = nil
+		end
+
 		# Executes the actual call for GetProducts
 		def mount_frame
 			frame = {
