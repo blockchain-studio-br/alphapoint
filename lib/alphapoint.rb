@@ -20,14 +20,11 @@ module Alphapoint
 			@unsub_actions = []
 		end
 
-		def register_action(action, type)
-			action.type = type
+		def register_action(action)
 			@actions << action
 
-			if EM.reactor_running?
-				EM.stop_event_loop # checar esse comando
-			end
-
+			EM.stop_event_loop if EM.reactor_running?
+			
 			return @actions
 		end
 
@@ -42,16 +39,16 @@ module Alphapoint
 				@unsub_actions += mapped_actions
 			end
 
+			@unsub_actions += mapped_actions if condition.second == SUBSCRIBE
+			
 			@actions -= mapped_actions
 		end
 
 		def drop_action(id)
 			mapped_action = @actions.select { |action| action.iValue != id}
-
-			if mapped_action.type == SUBSCRIBE
-				@unsub_actions += mapped_action
-			end
-
+	
+			@unsub_actions += mapped_action if mapped_action.type == SUBSCRIBE
+			
 			@actions -= mapped_action
 		end
 
