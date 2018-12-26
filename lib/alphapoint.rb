@@ -29,17 +29,14 @@ module Alphapoint
 		end
 
 		# Se a ação for de subscribe precisa mandar um unsubscribe pro servidor
-		def drop_actions(condition)
+		def drop_actions
+			mapped_actions = @actions
 
-			mapped_actions = @actions.select { |action| 
-				action.type == condition.second and action.class.name == condition.first
-			}
-
-			if condition.second == SUBSCRIBE
-				@unsub_actions += mapped_actions
+			if block_given? 
+				mapped_actions = @actions.select { |action| yield(action) }
 			end
 
-			@unsub_actions += mapped_actions if condition.second == SUBSCRIBE
+			@unsub_actions += mapped_actions.select { |action| action.type == SUBSCRIBE }
 			
 			@actions -= mapped_actions
 		end
