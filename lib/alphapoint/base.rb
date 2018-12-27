@@ -7,15 +7,16 @@ module Alphapoint
 		attr_accessor :iValue
 		attr_accessor :type
 
-		def initialize(payload)
+		def initialize(payload, type)
 			@payload = payload
+			@type = type
+			@response = nil
 		end
 
 		def setPayloadNil
 			@payload = nil
 		end
 
-		# Executes the actual call for GetProducts
 		def mount_frame
 			frame = {
 				'm': @type,

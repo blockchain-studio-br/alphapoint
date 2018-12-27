@@ -33,7 +33,11 @@ Gem::Specification.new do |spec|
   #   `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   # end
 
-  spec.files = ["lib/alphapoint.rb", "lib/alphapoint/get_products.rb", "lib/alphapoint/version.rb"]
+  spec.files = ["lib/alphapoint.rb",
+    "lib/alphapoint/base.rb",
+    "lib/alphapoint/websocket.rb",
+    "lib/alphapoint/get_products.rb",
+    "lib/alphapoint/version.rb"]
 
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }

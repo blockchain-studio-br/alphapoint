@@ -1,15 +1,14 @@
-require 'json'
+require 'alphapoint/base'
 
 module Alphapoint
 	class GetProducts < Base
 		@@call_name = 'GetProducts'
 
 		def handle_response(data)
-			# p data # This is for debugging only
-
-			if data['m'] == 1 # reply
+			if data['m'] == Alphapoint.response_of(@type)
 				if data['n'] == @@call_name
-					p data
+					p(data)
+					@response = data['o']
 				end
 			end
 		end
