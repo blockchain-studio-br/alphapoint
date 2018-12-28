@@ -19,6 +19,10 @@ module Alphapoint
 		end
 
 		def register_action(action)
+			unless action.class < Alphapoint::Base
+				raise Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base"
+			end
+
 			@actions << action
 
 			EM.stop_event_loop if EM.reactor_running?

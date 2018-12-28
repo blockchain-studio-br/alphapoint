@@ -37,4 +37,42 @@ RSpec.describe Alphapoint::WebSocket do
 
   end
 
+  context "add actions" do 
+
+  	before(:all) do
+	    Alphapoint.configure do |config|
+	      config.address = "wss://api_apexqa.alphapoint.com/WSGateway/"
+	    end
+
+	    @websocket = Alphapoint::WebSocket.new
+	end
+
+  	context "register actions" do
+
+  		it "expect save actions inherit  Alphapoint::Base" do 
+	  		expect {
+	  			class RequestCommand < Alphapoint::Base
+
+	  			end
+
+	  			@websocket.register_action(RequestCommand.new)
+	  		} .not_to raise_error
+	  	end
+
+	  	it "expect avoid actions that class is Alphapoint::Base" do 
+	  		expect {
+	  			@websocket.register_action(Alphapoint::Base.new)
+	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
+	  	end
+
+	  	it "expect avoid actions not inherit Alphapoint::Base" do 
+	  		expect {
+	  			@websocket.register_action(Object.new)
+	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
+	  	end
+
+  	end
+
+  end
+
 end

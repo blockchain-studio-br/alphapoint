@@ -7,7 +7,7 @@ module Alphapoint
 		attr_accessor :iValue
 		attr_accessor :type
 
-		def initialize(payload, type)
+		def initialize(payload = {}, type = 2)
 			@payload = payload
 			@type = type
 			@response = nil
