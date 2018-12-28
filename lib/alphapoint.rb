@@ -1,8 +1,9 @@
 require 'alphapoint/version'
 require 'faye/websocket'
 require 'eventmachine'
-require 'alphapoint/get_products'
+require 'alphapoint/configuration'
 require 'alphapoint/base'
+require 'alphapoint/get_products'
 require 'alphapoint/websocket'
 require 'yaml'
 
@@ -23,35 +24,37 @@ module Alphapoint
 		end
 	end
 
-	@config = {
-		'address': '',
-		'user': '',
-		'password': ''
-	}
+	class << self
+		attr_accessor :configuration
+	end
 
-	@valid_config_keys = @config.keys
+	def self.configuration
+		@configuration ||= Configuration.new
+	end
 
-	# Configure through hash
-	def self.configure(opts = {})
-		opts.each {|k,v| @config[k.to_sym] = v if @valid_config_keys.include? k.to_sym}
+	def self.reset
+		@configuration = Configuration.new
+	end
+
+	def self.configure
+		yield(configuration)
 	end
 
 	def self.configure_with(path_to_yaml_file)
-	    begin
-	      config = YAML.load(IO.read(path_to_yaml_file))
-	    rescue Errno::ENOENT
-	      log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
-	    rescue Psych::SyntaxError
-	      log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
-	    end
+	    configure do |configuration|
+	    	begin
+		    	config = YAML.load(IO.read(path_to_yaml_file))
 
-	    configure(config)
+			    configuration.address = config.address
+				configuration.user = config.user
+				configuration.password = config.password
+
+		    rescue Errno::ENOENT
+		      log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
+		    rescue Psych::SyntaxError
+		      log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
+		    end
+	    end
 	end
 
-	def self.config
-    	@config
-  	end
-
 end
-
-

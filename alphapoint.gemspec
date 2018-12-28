@@ -6,11 +6,11 @@ require "alphapoint/version"
 Gem::Specification.new do |spec|
   spec.name          = "alphapoint"
   spec.version       = Alphapoint::VERSION
-  spec.authors       = ["Miguel Corti"]
-  spec.email         = ["miguelszcorti@gmail.com"]
+  spec.authors       = ["Miguel Corti", "Fabiano Martins"]
+  spec.email         = ["miguelszcorti@gmail.com", "fabiano.paula.martins@gmail.com"]
 
-  spec.summary       = ""
-  spec.description   = ""
+  spec.summary       = "Alphapoint websocket DSL"
+  spec.description   = "Alphapoint websocket DSL is to easy request and listen event"
   spec.homepage      = "https://github.com/blockchain-studio-br/alphapoint"
   spec.license       = "MIT"
 
@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   # end
 
   spec.files = ["lib/alphapoint.rb",
+    "lib/alphapoint/configuration.rb",
     "lib/alphapoint/base.rb",
     "lib/alphapoint/websocket.rb",
     "lib/alphapoint/get_products.rb",
