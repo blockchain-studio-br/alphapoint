@@ -48,7 +48,7 @@ RSpec.describe Alphapoint::Base do
   	it "expect to return a Hash" do 
   		obj = Alphapoint::Base.new({})
 
-  		expect(obj.mount_frame.class).to be(Hash)
+  		expect(obj.mount_frame(1).class).to be(Hash)
   	end
 
   end

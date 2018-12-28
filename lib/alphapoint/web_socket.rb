@@ -7,17 +7,22 @@ module Alphapoint
 		attr_accessor :address
 
 		def initialize(address = nil)
-
 			if Alphapoint.configuration.nil? || 
 				Alphapoint.configuration.address.nil? ||
 					Alphapoint.configuration.address.empty? 
 				raise AlphapointError, "Pass or configure an address to conect on WebSocket"				
 			end
 
+			@ws = nil
 			@address = address || Alphapoint.configuration.address
 			@nextIValue = 2
 			@actions = []
 			@unsub_actions = []
+		end
+
+		def ws_instance 
+			@ws = Faye::WebSocket::Client.new(@address) unless @ws
+			@ws
 		end
 
 		def register_action(action)
@@ -52,40 +57,45 @@ module Alphapoint
 			@actions -= mapped_action
 		end
 
-		def execute			
-			EM.run{
-				@ws = Faye::WebSocket::Client.new(@address)
+		def execute_requests
+			number_of_actions = @actions.length
+			responses_receive = 0
+			alpha_self = self
+			EM.run do
+				ws = alpha_self.ws_instance
 
-				@ws.on :open do |event|
-					@actions.each do |action|
-						p [:open, action.class.name]
-
-						action.iValue = @nextIValue
-
-						frame = JSON.generate(action.mount_frame)
-						@ws.send(frame)
-
-						@nextIValue += 2
-					end
+				ws.on :open do |event|
+					p [:open, "Websocket connected to #{@address}"]
 				end
 
-				@ws.on :message do |event|
-					p [:message]
-					data = JSON.parse(event.data)
-
-					unsubscribe_dropped_actions
-
-					delegate_message(data)
+				ws.on :message do |event|
+					delegate_message(JSON.parse(event.data))
+					responses_receive += 1
+					EM.stop if responses_receive == number_of_actions
 				end
 
-				@ws.on :close do |event|
+				ws.on :close do |event|
 					p [:close]
 				end
-			}
+
+				alpha_self.send_requests	
+			end
+
+			true
+		end
+
+		def send_requests
+
+			@actions
+				.select { |elem| elem.type == Alphapoint::REQUEST }
+				.each do |action|
+					frame = JSON.generate(action.mount_frame(@nextIValue))
+					self.ws_instance.send(frame)
+					@nextIValue += 2
+				end
 		end
 
 		private
-
 			# Check actions that are unsubscribing
 			# And notify the server
 			def unsubscribe_dropped_actions
@@ -104,9 +114,9 @@ module Alphapoint
 				received_action = @actions.select { |action| action.iValue == data['i']}
 
 				if !received_action.nil?
-					received_action.first.handle_response(data)
-					p [:message, received_action.class.name]
-
+					received_action.first.value = data['o']
+					received_action.first.handle_response(data['o'])
+					
 					if received_action.count > 1
 						p "Warning: More than one action with same id were retrieved, only one was treated"
 					end

@@ -51,9 +51,7 @@ RSpec.describe Alphapoint::WebSocket do
 
   		it "expect save actions inherit  Alphapoint::Base" do 
 	  		expect {
-	  			class RequestCommand < Alphapoint::Base
-
-	  			end
+	  			class RequestCommand < Alphapoint::Base; end
 
 	  			@websocket.register_action(RequestCommand.new)
 	  		} .not_to raise_error
@@ -71,6 +69,47 @@ RSpec.describe Alphapoint::WebSocket do
 	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
 	  	end
   	end
+
+  	context "execute actions" do 
+
+  		before(:all) do
+		    Alphapoint.configure do |config|
+		      config.address = "wss://api_apexqa.alphapoint.com/WSGateway/"
+		    end
+
+		    @websocket = Alphapoint::WebSocket.new
+		end
+
+		context "requests" do
+
+	  		it "expect to execute method finish" do
+	  			
+  				class GetProducts < Alphapoint::Base
+					@@call_name = 'GetProducts'
+
+					def handle_response(data)		
+						#p(data)
+					end
+				end
+
+				class GetInstruments < Alphapoint::Base
+					@@call_name = 'GetInstruments'
+
+					def handle_response(data)		
+						#p(data)
+					end
+				end
+
+				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::REQUEST))
+				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::REQUEST))
+
+	  			expect(@websocket.execute_requests).to be_truthy
+	  		end
+
+
+  		end
+
+  	end 
   end
 
 end
