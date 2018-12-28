@@ -31,11 +31,12 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
+  spec.add_runtime_dependency "eventmachine",   "~> 1.2.7",  ">= 1.2.7"
+  spec.add_runtime_dependency "faye-websocket", "~> 0.10.7", ">= 0.10.7"
+
   spec.add_development_dependency "bundler", "~> 1.17"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "eventmachine"
-  spec.add_development_dependency "guard-rspec"
-  # spec.add_development_dependency "faye"
-  spec.add_development_dependency "faye-websocket"
+  spec.add_development_dependency "guard-rspec", "~> 4.7.3", ">= 4.7.3"
+  
 end

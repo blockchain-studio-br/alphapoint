@@ -2,6 +2,8 @@ PATH
   remote: .
   specs:
     alphapoint (0.1.0)
+      eventmachine (~> 1.2.7, >= 1.2.7)
+      faye-websocket (~> 0.10.7, >= 0.10.7)
 
 GEM
   remote: https://rubygems.org/
@@ -71,11 +73,9 @@ PLATFORMS
 DEPENDENCIES
   alphapoint!
   bundler (~> 1.17)
-  eventmachine
-  faye-websocket
-  guard-rspec
+  guard-rspec (~> 4.7.3, >= 4.7.3)
   rake (~> 10.0)
   rspec (~> 3.0)
 
 BUNDLED WITH
-   1.17.2
+   1.17.3
