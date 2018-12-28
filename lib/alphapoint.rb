@@ -1,20 +1,27 @@
 require 'alphapoint/version'
 require 'faye/websocket'
 require 'eventmachine'
-require 'alphapoint/configuration'
-require 'alphapoint/base'
-require 'alphapoint/get_products'
-require 'alphapoint/web_socket'
 require 'yaml'
+
+
+require 'alphapoint/configuration'
+require 'alphapoint/web_socket'
+
+require 'alphapoint/call/base'
+require 'alphapoint/call/get_products'
+
+
 
 module Alphapoint
 
-	REQUEST = 0
-	REPLY = 1
-	SUBSCRIBE = 2
-	EVENT = 3
-	UNSUBSCRIBE = 4
-	ERROR = 5
+	module Call
+		REQUEST = 0
+		REPLY = 1
+		SUBSCRIBE = 2
+		EVENT = 3
+		UNSUBSCRIBE = 4
+		ERROR = 5
+	end
 
 	class AlphapointError < StandardError
 

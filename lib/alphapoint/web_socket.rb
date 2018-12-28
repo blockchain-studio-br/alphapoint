@@ -26,8 +26,8 @@ module Alphapoint
 		end
 
 		def register_action(action)
-			unless action.class < Alphapoint::Base
-				raise Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base"
+			unless action.class < Alphapoint::Call::Base
+				raise Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Call::Base"
 			end
 
 			@actions << action
@@ -87,7 +87,7 @@ module Alphapoint
 		def send_requests
 
 			@actions
-				.select { |elem| elem.type == Alphapoint::REQUEST }
+				.select { |elem| elem.type == Alphapoint::Call::REQUEST }
 				.each do |action|
 					frame = JSON.generate(action.mount_frame(@nextIValue))
 					self.ws_instance.send(frame)

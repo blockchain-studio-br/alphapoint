@@ -49,24 +49,24 @@ RSpec.describe Alphapoint::WebSocket do
 
   	context "register actions" do
 
-  		it "expect save actions inherit  Alphapoint::Base" do 
+  		it "expect save actions inherit  Alphapoint::Call::Base" do 
 	  		expect {
-	  			class RequestCommand < Alphapoint::Base; end
+	  			class RequestCommand < Alphapoint::Call::Base; end
 
 	  			@websocket.register_action(RequestCommand.new)
 	  		} .not_to raise_error
 	  	end
 
-	  	it "expect avoid actions that class is Alphapoint::Base" do 
+	  	it "expect avoid actions that class is Alphapoint::Call::Base" do 
 	  		expect {
-	  			@websocket.register_action(Alphapoint::Base.new)
-	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
+	  			@websocket.register_action(Alphapoint::Call::Base.new)
+	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Call::Base")
 	  	end
 
-	  	it "expect avoid actions not inherit Alphapoint::Base" do 
+	  	it "expect avoid actions not inherit Alphapoint::Call::Base" do 
 	  		expect {
 	  			@websocket.register_action(Object.new)
-	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
+	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Call::Base")
 	  	end
   	end
 
@@ -84,7 +84,7 @@ RSpec.describe Alphapoint::WebSocket do
 
 	  		it "expect to execute method finish" do
 	  			
-  				class GetProducts < Alphapoint::Base
+  				class GetProducts < Alphapoint::Call::Base
 					@@call_name = 'GetProducts'
 
 					def handle_response(data)		
@@ -92,7 +92,7 @@ RSpec.describe Alphapoint::WebSocket do
 					end
 				end
 
-				class GetInstruments < Alphapoint::Base
+				class GetInstruments < Alphapoint::Call::Base
 					@@call_name = 'GetInstruments'
 
 					def handle_response(data)		
@@ -100,8 +100,8 @@ RSpec.describe Alphapoint::WebSocket do
 					end
 				end
 
-				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::REQUEST))
-				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::REQUEST))
+				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::Call::REQUEST))
+				@websocket.register_action(GetProducts.new({ OMSid: 1}, Alphapoint::Call::REQUEST))
 
 	  			expect(@websocket.execute_requests).to be_truthy
 	  		end
