@@ -85,7 +85,11 @@ RSpec.describe Alphapoint::WebSocket do
 	  		it "expect to execute method finish" do
 	  			
   				class GetProducts < Alphapoint::Call::Base
-					@@call_name = 'GetProducts'
+
+					def initialize(payload = {}, type = 2)
+						super(payload, type)
+						@call_name = 'GetProducts'
+					end
 
 					def handle_response(data)		
 						#p(data)
@@ -93,7 +97,11 @@ RSpec.describe Alphapoint::WebSocket do
 				end
 
 				class GetInstruments < Alphapoint::Call::Base
-					@@call_name = 'GetInstruments'
+
+					def initialize(payload = {}, type = 2)
+						super(payload, type)
+						@call_name = 'GetInstruments'
+					end
 
 					def handle_response(data)		
 						#p(data)

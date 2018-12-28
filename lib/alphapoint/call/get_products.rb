@@ -5,7 +5,12 @@ module Alphapoint
 	module Call
 
 		class GetProducts < Base
-			@@call_name = 'GetProducts'
+
+			def initialize(payload = {}, type = 2)
+				super(payload, type)
+				@call_name = 'GetProducts'
+			end
+			
 
 			def handle_response(data)
 				p(data)

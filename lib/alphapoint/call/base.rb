@@ -5,11 +5,11 @@ module Alphapoint
 	module Call
 
 		class Base
-			@@call_name = 'BaseFunction'
-
+			
 			attr_accessor :iValue, :type, :value
 
 			def initialize(payload = {}, type = 2)
+				@call_name = 'BaseFunction'
 				@payload = payload
 				@type = type
 				@response = nil
@@ -26,7 +26,7 @@ module Alphapoint
 				frame = {
 					'm': @type,
 					'i': @iValue,
-					'n': @@call_name,
+					'n': @call_name,
 					'o': JSON.generate(@payload)
 				}
 
@@ -38,5 +38,5 @@ module Alphapoint
 		end
 
 	end
-	
+
 end
