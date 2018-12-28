@@ -74,6 +74,7 @@ DEPENDENCIES
   alphapoint!
   bundler (~> 1.17)
   guard-rspec (~> 4.7.3, >= 4.7.3)
+  pry (~> 0.12.2, >= 0.12.2)
   rake (~> 10.0)
   rspec (~> 3.0)
 
