@@ -25,7 +25,7 @@ module Alphapoint
 				'o': JSON.generate(@payload)
 			}
 
-			return JSON.generate(frame)
+			return frame
 		end
 
 		def handle_response(data)			

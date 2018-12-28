@@ -70,9 +70,7 @@ RSpec.describe Alphapoint::WebSocket do
 	  			@websocket.register_action(Object.new)
 	  		}.to raise_error(Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Base")
 	  	end
-
   	end
-
   end
 
 end

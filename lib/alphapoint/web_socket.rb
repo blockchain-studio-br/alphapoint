@@ -1,3 +1,5 @@
+require 'json'
+
 module Alphapoint
 
 	class WebSocket
@@ -60,7 +62,7 @@ module Alphapoint
 
 						action.iValue = @nextIValue
 
-						frame = action.mount_frame
+						frame = JSON.generate(action.mount_frame)
 						@ws.send(frame)
 
 						@nextIValue += 2
