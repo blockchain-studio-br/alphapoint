@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
   spec.files = ["lib/alphapoint.rb",
     "lib/alphapoint/configuration.rb",
     "lib/alphapoint/base.rb",
-    "lib/alphapoint/websocket.rb",
+    "lib/alphapoint/web_socket.rb",
     "lib/alphapoint/get_products.rb",
     "lib/alphapoint/version.rb"]
 

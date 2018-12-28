@@ -4,7 +4,7 @@ require 'eventmachine'
 require 'alphapoint/configuration'
 require 'alphapoint/base'
 require 'alphapoint/get_products'
-require 'alphapoint/websocket'
+require 'alphapoint/web_socket'
 require 'yaml'
 
 module Alphapoint
@@ -15,6 +15,14 @@ module Alphapoint
 	EVENT = 3
 	UNSUBSCRIBE = 4
 	ERROR = 5
+
+	class AlphapointError < StandardError
+
+		def initialize(msg="Alphapoint error and conection failed")
+		    super
+		end
+
+	end
 
 	def self.response_of(type)
 		if type == REQUEST
@@ -50,9 +58,9 @@ module Alphapoint
 				configuration.password = config.password
 
 		    rescue Errno::ENOENT
-		      log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
+		    #  log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
 		    rescue Psych::SyntaxError
-		      log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
+		    #  log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
 		    end
 	    end
 	end

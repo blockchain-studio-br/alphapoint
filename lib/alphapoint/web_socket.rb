@@ -1,10 +1,18 @@
 module Alphapoint
-	class WebSocket
-		def initialize
-			file_path = File.join(File.dirname(__FILE__),"/alphapoint.yml")
-			Alphapoint.configure_with file_path
 
-			@address = Alphapoint.config[:address]
+	class WebSocket
+		
+		attr_accessor :address
+
+		def initialize(address = nil)
+
+			if Alphapoint.configuration.nil? || 
+				Alphapoint.configuration.address.nil? ||
+					Alphapoint.configuration.address.empty? 
+				raise AlphapointError, "Pass or configure an address to conect on WebSocket"				
+			end
+
+			@address = address || Alphapoint.configuration.address
 			@nextIValue = 2
 			@actions = []
 			@unsub_actions = []
@@ -101,4 +109,5 @@ module Alphapoint
 				end
 			end
 	end # End Class
+
 end # End Module
