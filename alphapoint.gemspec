@@ -39,5 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "pry", "~> 0.12.2", ">= 0.12.2"
   spec.add_development_dependency "guard-rspec", "~> 4.7.3", ">= 4.7.3"
+
+  spec.add_dependency "activesupport"
   
 end
