@@ -14,8 +14,14 @@ module Alphapoint
     end
 
     def execute(ws, &block)
-      responses = []
       ws.send(@frame.to_json)
+      on_message(ws) do |response|
+        block.call(response)
+      end
+    end
+
+    def on_message(ws, &block)
+      responses = []
       ws.on :message do |event|
         products_json = JSON.parse(event.data)
         JSON.parse(products_json["o"]).each do |product_json|
@@ -27,6 +33,5 @@ module Alphapoint
   end
   
   class GetProductsResponse < Struct.new(:oms_id, :product_id, :product, :product_full_name, :product_type, :decimal_places,:tick_size,:no_fees )
-   
   end
 end
