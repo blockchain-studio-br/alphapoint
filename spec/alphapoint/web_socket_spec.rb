@@ -37,4 +37,40 @@ RSpec.describe Alphapoint::WebSocket do
 
   end
 
+  context "Resquest to atomic functions " do 
+
+  	before(:all) do
+	    Alphapoint.configure do |config|
+	      config.address = "wss://api_apexqa.alphapoint.com/WSGateway/"
+	    end
+	end
+
+	let(:web_socket) do 
+		Alphapoint::WebSocket.new
+	end
+
+  	context " error response " do 
+
+  		it " expect a AlphapointError if doesn't exists" do
+  			expect {
+	  			web_socket.xzsd
+	  		}.to raise_error(Alphapoint::AlphapointError, "Method xzsd not implemented yet")
+	  	end
+
+  	end
+
+  	context " call API methods " do 
+
+  		context "GetProducts" do 
+
+ 			it " expect not to raise error when is call	" do
+				expect {
+					web_socket.get_products({ OMSId: 1 })
+				}.not_to raise_error
+		  	end
+
+  		end
+   	end
+  end
+
 end

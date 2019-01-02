@@ -39,10 +39,8 @@ module Alphapoint
 
 					@ws.on :close do |event|
 						p [:close, event.code, event.reason]
-						@ws = nil
 					end
 				end
-
 			end
 		end
 
@@ -51,12 +49,12 @@ module Alphapoint
 			  'm': type,
 			  'i': @nextIValue,
 			  'n': function_name,
-			  'o': payload.to_json
-			}.to_json
+			  'o': JSON.generate(payload)
+			}
 
 			@response[@nextIValue] = block
 			@nextIValue += 2
-			@ws.send(frame)
+			@ws.send(JSON.generate(frame))
 		end
 
 		# Finds the action responsible for the received message
