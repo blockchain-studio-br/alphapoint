@@ -4,17 +4,9 @@ require 'eventmachine'
 require 'yaml'
 require 'active_support/all'
 
-
 require 'alphapoint/configuration'
 require 'alphapoint/web_socket'
-require 'alphapoint/web_socket_propose'
-require 'alphapoint/get_products'
-
-require 'alphapoint/call/base'
-require 'alphapoint/call/get_products'
-
-
-
+	
 module Alphapoint
 
 	module Call
