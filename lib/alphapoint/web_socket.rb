@@ -16,114 +16,78 @@ module Alphapoint
 			@ws = nil
 			@address = address || Alphapoint.configuration.address
 			@nextIValue = 2
-			@actions = []
+			@avaliable_functions = [
+				"GetProducts"
+			]
+			@response = {}
+			
 			@unsub_actions = []
-		end
 
-		def ws_instance 
-			@ws = Faye::WebSocket::Client.new(@address) unless @ws
-			@ws
-		end
-
-		def register_action(action)
-			unless action.class < Alphapoint::Call::Base
-				raise Alphapoint::AlphapointError, "Actions need to inherit Alphapoint::Call::Base"
-			end
-
-			@actions << action
-
-			EM.stop_event_loop if EM.reactor_running?
-			
-			return @actions
-		end
-
-		def drop_actions
-			mapped_actions = @actions
-
-			if block_given? 
-				mapped_actions = @actions.select { |action| yield(action) }
-			end
-
-			@unsub_actions += mapped_actions.select { |action| action.type == SUBSCRIBE }
-			
-			@actions -= mapped_actions
-		end
-
-		def drop_action(id)
-			mapped_action = @actions.select { |action| action.iValue != id}
-
-			@unsub_actions += mapped_action if mapped_action.type == SUBSCRIBE
-			
-			@actions -= mapped_action
-		end
-
-		def execute_requests
-			number_of_actions = @actions.length
-			responses_receive = 0
 			alpha_self = self
-			EM.run do
-				ws = alpha_self.ws_instance
 
-				ws.on :open do |event|
-					p [:open, "Websocket connected to #{@address}"]
-				end
+			@thread = Thread.new do 
+				EM.run do
+					@ws = Faye::WebSocket::Client.new(@address)
 
-				ws.on :message do |event|
-					delegate_message(JSON.parse(event.data))
-					responses_receive += 1
-					EM.stop if responses_receive == number_of_actions
-				end
-
-				ws.on :close do |event|
-					p [:close]
-				end
-
-				alpha_self.send_requests	
-			end
-
-			true
-		end
-
-		def send_requests
-
-			@actions
-				.select { |elem| elem.type == Alphapoint::Call::REQUEST }
-				.each do |action|
-					frame = JSON.generate(action.mount_frame(@nextIValue))
-					self.ws_instance.send(frame)
-					@nextIValue += 2
-				end
-		end
-
-		private
-			# Check actions that are unsubscribing
-			# And notify the server
-			def unsubscribe_dropped_actions
-				@unsub_actions.each do |action|
-					action.type = UNSUBSCRIBE
-					action.setPayloadNil
-
-					frame = action.mount_frame
-
-					@ws.send(frame)
-				end
-			end
-
-			# Finds the action responsible for the received message
-			def delegate_message(data)
-				received_action = @actions.select { |action| action.iValue == data['i']}
-
-				if !received_action.nil?
-					received_action.first.value = data['o']
-					received_action.first.handle_response(data['o'])
-					
-					if received_action.count > 1
-						p "Warning: More than one action with same id were retrieved, only one was treated"
+					@ws.on :open do |event|
+						p [:open, "Websocket connected to #{@address}"]
 					end
-				else
-					p "Error: Received message has no correspondent id"
+
+					@ws.on :message do |event|
+						alpha_self.delegate_message(JSON.parse(event.data).with_indifferent_access)
+					end
+
+					@ws.on :close do |event|
+						p [:close, event.code, event.reason]
+						@ws = nil
+					end
 				end
+
 			end
+		end
+
+		def build_request(function_name, payload,type = 0, &block)
+			frame = {
+			  'm': type,
+			  'i': @nextIValue,
+			  'n': function_name,
+			  'o': payload.to_json
+			}.to_json
+
+			@response[@nextIValue] = block
+			@nextIValue += 2
+			@ws.send(frame)
+		end
+
+		# Finds the action responsible for the received message
+		def delegate_message(data)
+			received_action = @response[data['i']]
+
+			if !received_action.nil? && received_action.is_a?(Proc)
+				received_action.call(JSON.parse(data['o']))
+				@response[data['i']] = nil
+			else
+				p "Error: Received message has no correspondent id"
+			end
+		end
+
+		def method_missing(m, *args, &block)
+			function_name = m.to_s.camelcase
+			respond_action = @avaliable_functions.select{ |func| func ==  function_name }
+			if respond_action.size > 0
+				puts "Delegating to action: #{m}"
+
+				payload = args[0] || {}
+				type = args[1].to_i || 0
+
+				build_request(function_name, payload, type) do |response|
+					block.call(response)
+				end
+			else
+				raise "Method #{m} not implemented yet"
+			end
+	    end
+			
 	end # End Class
 
 end # End Module
