@@ -17,8 +17,13 @@ module Alphapoint
 			@address = address || Alphapoint.configuration.address
 			@nextIValue = 2
 			@avaliable_functions = [
+				"GetInstrument",
+				"GetInstruments",
+				"GetProduct",
 				"GetProducts",
-				"GetProduct"
+				"SendOrder",
+				"SubscribeLevel1",
+				"WebAuthenticateUser"
 			]
 			@response = {}
 			
@@ -66,7 +71,7 @@ module Alphapoint
 				received_action.call(JSON.parse(data['o']))
 				@response[data['i']] = nil
 			else
-				p "Error: Received message has no correspondent id"
+				raise "Error: Received message has no correspondent id"
 			end
 		end
 
@@ -85,7 +90,7 @@ module Alphapoint
 			else
 				raise "Method #{m} not implemented yet"
 			end
-	  end
+		end
 			
 	end # End Class
 
