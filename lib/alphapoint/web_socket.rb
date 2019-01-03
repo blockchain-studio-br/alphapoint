@@ -17,7 +17,8 @@ module Alphapoint
 			@address = address || Alphapoint.configuration.address
 			@nextIValue = 2
 			@avaliable_functions = [
-				"GetProducts"
+				"GetProducts",
+				"GetProduct"
 			]
 			@response = {}
 			
@@ -84,7 +85,7 @@ module Alphapoint
 			else
 				raise "Method #{m} not implemented yet"
 			end
-	    end
+	  end
 			
 	end # End Class
 

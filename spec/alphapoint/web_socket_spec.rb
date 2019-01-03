@@ -40,37 +40,53 @@ RSpec.describe Alphapoint::WebSocket do
   context "Resquest to atomic functions " do 
 
   	before(:all) do
-	    Alphapoint.configure do |config|
-	      config.address = "wss://api_apexqa.alphapoint.com/WSGateway/"
-	    end
+	    Alphapoint.configure do |config| config.address = "wss://api_apexqa.alphapoint.com/WSGateway/" end
 	end
 
 	let(:web_socket) do 
 		Alphapoint::WebSocket.new
 	end
 
-  	context " error response " do 
+	let(:mocked_get_products_valid_response) {[
+			{"OMSId": 1, "ProductId": 1, "Product": "BTC", "ProductFullName": "Bitcoin", "ProductType": "CryptoCurrency", "DecimalPlaces": 8, "TickSize": 1.0, "NoFees": false}
+		]
+	}
 
-  		it " expect a AlphapointError if doesn't exists" do
-  			expect {
-	  			web_socket.xzsd
-	  		}.to raise_error(Alphapoint::AlphapointError, "Method xzsd not implemented yet")
-	  	end
-
-  	end
-
-  	context " call API methods " do 
-
-  		context "GetProducts" do 
-
- 			it " expect not to raise error when is call	" do
+	let(:mocked_get_product_valid_response) {
+			{"OMSId": 1, "ProductId": 1, "Product": "BTC", "ProductFullName": "Bitcoin", "ProductType": "CryptoCurrency", "DecimalPlaces": 8, "TickSize": 1.0, "NoFees": false}
+	}
+	
+		context " error response " do 
+			it " expect a AlphapointError if doesn't exists" do
 				expect {
-					web_socket.get_products({ OMSId: 1 })
-				}.not_to raise_error
-		  	end
+					web_socket.xzsd
+				}.to raise_error(RuntimeError, "Method xzsd not implemented yet")
+			end
+		end
 
-  		end
-   	end
+		context " call API methods " do 
+			context "GetProducts" do 
+				it " expect to get an array with all products	" do
+					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_products_valid_response)
+					response = nil
+					web_socket.delegate_message {|resp| response = resp}
+					expect(response.size).to eq 1
+					expect(response.class.name).to eq "Array"
+					expect(response.first[:Product]).to eq "BTC"
+					expect(response.first[:ProductId]).to eq 1
+				end
+			end
+
+			context "GetProduct" do 
+				it " expect to get one product represented as a Hash	", focus: true do
+					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_product_valid_response)
+					response = nil
+					web_socket.delegate_message {|resp| response = resp}
+					expect(response.class.name).to eq "Hash"
+					expect(response[:Product]).to eq "BTC"
+					expect(response[:ProductId]).to eq 1
+				end
+			end
+		end
   end
-
 end
