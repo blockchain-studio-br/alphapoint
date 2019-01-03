@@ -43,11 +43,21 @@ module Alphapoint
 						alpha_self.delegate_message(JSON.parse(event.data).with_indifferent_access)
 					end
 
+					@ws.on :error do |event|
+					  	p [:error, event.inspect]
+					end
+
 					@ws.on :close do |event|
 						p [:close, event.code, event.reason]
 					end
 				end
 			end
+
+			trap(:INT) { EM.stop }
+			trap(:TERM){ EM.stop }
+			
+			while not EM.reactor_running?; end
+		    while not EM.defers_finished?; end
 		end
 
 		def build_request(function_name, payload,type = 0, &block)
