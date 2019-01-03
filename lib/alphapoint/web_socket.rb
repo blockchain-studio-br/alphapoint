@@ -37,7 +37,7 @@ module Alphapoint
 
 					@ws.on :open do |event|
 						p [:open, "Websocket connected to #{@address}"]
-						instance_eval(&block)
+						block.call(self)
 					end
 
 					@ws.on :message do |event|
@@ -62,6 +62,7 @@ module Alphapoint
 			while not EM.reactor_running?; end
 		    while not EM.defers_finished?; end
 		    
+		    self
 		end
 
 		def build_request(function_name, payload,type = 0, &block)
