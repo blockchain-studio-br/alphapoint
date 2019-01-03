@@ -75,6 +75,14 @@ module Alphapoint
 			end
 		end
 
+		def get_quotes(payload = { OMSId: 1 }, &block) 
+			quotes = Alphapoint::GetQuotes.new(self)
+
+			quotes.execute(payload) do |res|
+				block.call(res)
+			end
+		end
+
 		def method_missing(m, *args, &block)
 			function_name = m.to_s.camelcase
 			respond_action = @avaliable_functions.select{ |func| func ==  function_name }

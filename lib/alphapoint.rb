@@ -6,6 +6,7 @@ require 'active_support/all'
 
 require 'alphapoint/configuration'
 require 'alphapoint/web_socket'
+require 'alphapoint/get_quotes'
 	
 module Alphapoint
 
