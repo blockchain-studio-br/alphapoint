@@ -6,8 +6,8 @@ require "alphapoint/version"
 Gem::Specification.new do |spec|
   spec.name          = "alphapoint"
   spec.version       = Alphapoint::VERSION
-  spec.authors       = ["Miguel Corti", "Fabiano Martins", "Lucas Pérez"]
-  spec.email         = ["miguelszcorti@gmail.com", "fabiano.paula.martins@gmail.com", "lucas@blockchainstudio.com.br"]
+  spec.authors       = ["Fabiano Martins", "Lucas Pérez","Miguel Corti"]
+  spec.email         = ["fabiano.paula.martins@gmail.com", "lucas@blockchainstudio.com.br", "miguelszcorti@gmail.com"]
 
   spec.summary       = "Alphapoint websocket DSL"
   spec.description   = "Alphapoint websocket DSL is to easy request and listen event"
