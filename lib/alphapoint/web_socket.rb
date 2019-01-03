@@ -6,7 +6,7 @@ module Alphapoint
 		
 		attr_accessor :address
 
-		def initialize(address = nil)
+		def connect(address = nil, &block)
 			if Alphapoint.configuration.nil? || 
 				Alphapoint.configuration.address.nil? ||
 					Alphapoint.configuration.address.empty? 
@@ -37,6 +37,7 @@ module Alphapoint
 
 					@ws.on :open do |event|
 						p [:open, "Websocket connected to #{@address}"]
+						instance_eval(&block)
 					end
 
 					@ws.on :message do |event|
@@ -53,11 +54,14 @@ module Alphapoint
 				end
 			end
 
+			p @thread.status
+
 			trap(:INT) { EM.stop }
 			trap(:TERM){ EM.stop }
 			
 			while not EM.reactor_running?; end
 		    while not EM.defers_finished?; end
+		    
 		end
 
 		def build_request(function_name, payload,type = 0, &block)
@@ -70,6 +74,7 @@ module Alphapoint
 
 			@response[@nextIValue] = block
 			@nextIValue += 2
+
 			@ws.send(JSON.generate(frame))
 		end
 

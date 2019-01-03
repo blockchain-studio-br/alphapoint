@@ -8,7 +8,7 @@ RSpec.describe Alphapoint::WebSocket do
 
 	  	it "expect a to have a address on configurations to conect" do 
 	  		expect {
-	  			Alphapoint::WebSocket.new
+	  			Alphapoint::WebSocket.new.connect
 	  		}.to raise_error(Alphapoint::AlphapointError, "Pass or configure an address to conect on WebSocket")
 	  	end
 
@@ -24,12 +24,12 @@ RSpec.describe Alphapoint::WebSocket do
 
 	  	it "expect a to create object with configurations options" do 
 	  		expect {
-	  			Alphapoint::WebSocket.new
+	  			Alphapoint::WebSocket.new.connect
 	  		} .not_to raise_error
 	  	end
 
 		it "expect a to create object with a address passed in constructor" do 
-	  		web_socket = Alphapoint::WebSocket.new("wss://example.api_apexqa.alphapoint.com/WSGateway/")
+	  		web_socket = Alphapoint::WebSocket.new.connect("wss://example.api_apexqa.alphapoint.com/WSGateway/")
 	  		expect(web_socket.address).to eq("wss://example.api_apexqa.alphapoint.com/WSGateway/")
 	  	end
 
@@ -44,7 +44,9 @@ RSpec.describe Alphapoint::WebSocket do
 	end
 
 	let(:web_socket) do 
-		Alphapoint::WebSocket.new
+		Alphapoint::WebSocket.new.connect do |ws|
+			return ws
+		end
 	end
 
 	let(:mocked_get_products_valid_response) {[
