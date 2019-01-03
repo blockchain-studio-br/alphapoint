@@ -6,8 +6,8 @@ require "alphapoint/version"
 Gem::Specification.new do |spec|
   spec.name          = "alphapoint"
   spec.version       = Alphapoint::VERSION
-  spec.authors       = ["Miguel Corti", "Fabiano Martins"]
-  spec.email         = ["miguelszcorti@gmail.com", "fabiano.paula.martins@gmail.com"]
+  spec.authors       = ["Miguel Corti", "Fabiano Martins", "Lucas Pérez"]
+  spec.email         = ["miguelszcorti@gmail.com", "fabiano.paula.martins@gmail.com", "lucas@blockchainstudio.com.br"]
 
   spec.summary       = "Alphapoint websocket DSL"
   spec.description   = "Alphapoint websocket DSL is to easy request and listen event"
@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   if spec.respond_to?(:metadata)
-    spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+    #spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
 
     spec.metadata["homepage_uri"] = spec.homepage
     spec.metadata["source_code_uri"] = "https://github.com/blockchain-studio-br/alphapoint"
