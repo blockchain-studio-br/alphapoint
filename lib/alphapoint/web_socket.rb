@@ -33,6 +33,7 @@ module Alphapoint
 
 			mutex = Mutex.new
 			@thread = Thread.new do
+				sleep(500)
 				mutex.synchronize do
 						EM.run do
 							@ws = Faye::WebSocket::Client.new(@address)
@@ -42,7 +43,6 @@ module Alphapoint
 							end
 
 							@ws.on :message do |event|
-								puts "chegou mensagem: #{event}"
 								alpha_self.delegate_message(JSON.parse(event.data).with_indifferent_access)
 							end
 
