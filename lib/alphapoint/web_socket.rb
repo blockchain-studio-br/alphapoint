@@ -84,7 +84,9 @@ module Alphapoint
 			end
 		end
 
-		def get_quotes(payload = { OMSId: 1 }, &block) 
+		def get_quotes(payload = { OMSId: 1 }, &block)
+			wait_handshake
+		
 			quotes = Alphapoint::GetQuotes.new(self)
 
 			quotes.execute(payload) do |res|
@@ -93,8 +95,8 @@ module Alphapoint
 		end
 
 		def method_missing(m, *args, &block)
-			# to wait handshake finish
-			sleep(0.5)
+			wait_handshake
+			
 			function_name = m.to_s.camelcase
 			respond_action = @avaliable_functions.select{ |func| func ==  function_name }
 			if respond_action.size > 0
@@ -110,7 +112,11 @@ module Alphapoint
 				raise "Method #{m} not implemented yet"
 			end
 		end
-			
+		
+		private
+			def wait_handshake
+				sleep(0.5)
+			end
 	end # End Class
 
 end # End Module
