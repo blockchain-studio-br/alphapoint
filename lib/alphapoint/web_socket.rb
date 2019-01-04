@@ -31,13 +31,9 @@ module Alphapoint
 
 			alpha_self = self
 
-			mutex = Mutex.new
 			@thread = Thread.new do
-				sleep(500)
-				mutex.synchronize do
 						EM.run do
 							@ws = Faye::WebSocket::Client.new(@address)
-
 							@ws.on :open do |event|
 								p [:open, "Websocket connected to #{@address}"]
 							end
@@ -54,7 +50,6 @@ module Alphapoint
 								p [:close, event.code, event.reason]
 							end
 						end
-					end
 			end
 
 			trap(:INT) { EM.stop }
@@ -98,6 +93,8 @@ module Alphapoint
 		end
 
 		def method_missing(m, *args, &block)
+			# to wait handshake finish
+			sleep(0.5)
 			function_name = m.to_s.camelcase
 			respond_action = @avaliable_functions.select{ |func| func ==  function_name }
 			if respond_action.size > 0
