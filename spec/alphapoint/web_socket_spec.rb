@@ -8,7 +8,7 @@ RSpec.describe Alphapoint::WebSocket do
 
 	  	it "expect a to have a address on configurations to conect" do 
 	  		expect {
-	  			Alphapoint::WebSocket.new.connect
+	  			Alphapoint::WebSocket.new
 	  		}.to raise_error(Alphapoint::AlphapointError, "Pass or configure an address to conect on WebSocket")
 	  	end
 
@@ -17,21 +17,19 @@ RSpec.describe Alphapoint::WebSocket do
   	context "with setting configurations" do 
 
   		before(:all) do
-		    Alphapoint.configure do |config|
-		      config.address = "wss://api_apexqa.alphapoint.com/WSGateway/"
-		    end
+		    Alphapoint.configure do |config| config.address = "wss://api_apexqa.alphapoint.com/WSGateway/" end
 		end
 
 	  	it "expect a to create object with configurations options" do 
 	  		expect {
-	  			Alphapoint::WebSocket.new.connect
+	  			Alphapoint::WebSocket.new
 	  		} .not_to raise_error
 	  	end
 
 		it "expect a to create object with a address passed in constructor" do 
-	  		Alphapoint::WebSocket.new.connect("wss://example.api_apexqa.alphapoint.com/WSGateway/") do |ws|
-	  			expect(ws.address).to eq("wss://example.api_apexqa.alphapoint.com/WSGateway/")
-	  		end
+	  		ws = Alphapoint::WebSocket.new("wss://example.api_apexqa.alphapoint.com/WSGateway/")
+	  		expect(ws.address).to eq("wss://example.api_apexqa.alphapoint.com/WSGateway/")
+	  		
 	  		
 	  	end
 
@@ -43,12 +41,9 @@ RSpec.describe Alphapoint::WebSocket do
 
   	before(:all) do
 	    Alphapoint.configure do |config| config.address = "wss://api_apexqa.alphapoint.com/WSGateway/" end
-	    @web_socket = Alphapoint::WebSocket.new.connect do |ws|
-			return ws
 		end
-	end
 
-	 
+	let(:web_socket) {Alphapoint::WebSocket.new}
 	
 
 	let(:mocked_get_products_valid_response) {[
@@ -171,7 +166,7 @@ RSpec.describe Alphapoint::WebSocket do
 		context " error response " do 
 			it " expect a AlphapointError if doesn't exists" do
 				expect {
-					@web_socket.xzsd
+					web_socket.xzsd
 				}.to raise_error(RuntimeError, "Method xzsd not implemented yet")
 			end
 		end
@@ -181,7 +176,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to get an array with all products	" do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_products_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.size).to eq 1
 					expect(response.class.name).to eq "Array"
 					expect(response.first[:Product]).to eq "BTC"
@@ -193,7 +188,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to get one product represented as a Hash	", focus: true do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_product_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.class.name).to eq "Hash"
 					expect(response[:Product]).to eq "BTC"
 					expect(response[:ProductId]).to eq 1
@@ -204,7 +199,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to get an array with all instruments	" do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_instruments_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.size).to eq 7
 					expect(response.class.name).to eq "Array"
 					expect(response.first[:Symbol]).to eq "BTCUSD"
@@ -216,7 +211,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to get one product represented as a Hash ", focus: true do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_get_instrument_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.class.name).to eq "Hash"
 					expect(response[:Symbol]).to eq "BTCUSD"
 					expect(response[:InstrumentId]).to eq 1
@@ -227,7 +222,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to get ticker represented as a Hash ", focus: true do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_subscribe_level1_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.class.name).to eq "Hash"
 					expect(response[:BestBid]).to eq 0.00
 					expect(response[:InstrumentId]).to eq 1
@@ -238,7 +233,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to order confirmation represented as a Hash ", focus: true do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_send_order_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.class.name).to eq "Hash"
 					expect(response[:status]).to eq "Accepted"
 					expect(response[:errormsg]).to eq ""
@@ -250,7 +245,7 @@ RSpec.describe Alphapoint::WebSocket do
 				it " expect to login confirmation represented as a Hash ", focus: true do
 					allow_any_instance_of(Alphapoint::WebSocket).to receive(:delegate_message).and_yield(mocked_web_autheticate_user_valid_response)
 					response = nil
-					@web_socket.delegate_message {|resp| response = resp}
+					web_socket.delegate_message {|resp| response = resp}
 					expect(response.class.name).to eq "Hash"
 					expect(response[:Authenticated]).to eq true
 					expect(response[:SessionToken]).to eq "7d0ccf3a-ae63-44f5-a409-2301d80228bc"

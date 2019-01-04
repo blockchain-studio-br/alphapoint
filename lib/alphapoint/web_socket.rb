@@ -6,7 +6,7 @@ module Alphapoint
 		
 		attr_accessor :address
 
-		def connect(address = nil, &block)
+		def initialize(address = nil, &block)
 			if Alphapoint.configuration.nil? || 
 				Alphapoint.configuration.address.nil? ||
 					Alphapoint.configuration.address.empty? 
@@ -31,38 +31,37 @@ module Alphapoint
 
 			alpha_self = self
 
-			@thread = Thread.new do 
-				EM.run do
-					@ws = Faye::WebSocket::Client.new(@address)
+			mutex = Mutex.new
+			@thread = Thread.new do
+				mutex.synchronize do
+						EM.run do
+							@ws = Faye::WebSocket::Client.new(@address)
 
-					@ws.on :open do |event|
-						p [:open, "Websocket connected to #{@address}"]
-						block.call(self)
-					end
+							@ws.on :open do |event|
+								p [:open, "Websocket connected to #{@address}"]
+							end
 
-					@ws.on :message do |event|
-						alpha_self.delegate_message(JSON.parse(event.data).with_indifferent_access)
-					end
+							@ws.on :message do |event|
+								puts "chegou mensagem: #{event}"
+								alpha_self.delegate_message(JSON.parse(event.data).with_indifferent_access)
+							end
 
-					@ws.on :error do |event|
-					  	p [:error, event.inspect]
-					end
+							@ws.on :error do |event|
+									p [:error, event.inspect]
+							end
 
-					@ws.on :close do |event|
-						p [:close, event.code, event.reason]
+							@ws.on :close do |event|
+								p [:close, event.code, event.reason]
+							end
+						end
 					end
-				end
 			end
-
-			p @thread.status
 
 			trap(:INT) { EM.stop }
 			trap(:TERM){ EM.stop }
 			
 			while not EM.reactor_running?; end
-		    while not EM.defers_finished?; end
-		    
-		    self
+			while not EM.defers_finished?; end
 		end
 
 		def build_request(function_name, payload,type = 0, &block)
@@ -75,7 +74,6 @@ module Alphapoint
 
 			@response[@nextIValue] = block
 			@nextIValue += 2
-
 			@ws.send(JSON.generate(frame))
 		end
 
