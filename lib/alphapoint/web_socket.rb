@@ -24,6 +24,7 @@ module Alphapoint
 				"SendOrder",
 				"SubscribeLevel1",
 				"WebAuthenticateUser"
+				"GetOrderFee"
 			]
 			@response = {}
 			
