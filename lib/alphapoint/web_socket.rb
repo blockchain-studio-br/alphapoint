@@ -3,14 +3,15 @@ require 'json'
 module Alphapoint
 
 	class WebSocket
-		
+
 		attr_accessor :address
 
 		def initialize(address = nil, &block)
-			if Alphapoint.configuration.nil? || 
+			if (Alphapoint.configuration.nil? ||
 				Alphapoint.configuration.address.nil? ||
-					Alphapoint.configuration.address.empty? 
-				raise AlphapointError, "Pass or configure an address to conect on WebSocket"				
+				Alphapoint.configuration.address.empty?) &&
+				address.nil?
+				raise AlphapointError, "Pass or configure an address to conect on WebSocket"
 			end
 
 			@ws = nil
@@ -23,11 +24,11 @@ module Alphapoint
 				"GetProducts",
 				"SendOrder",
 				"SubscribeLevel1",
-				"WebAuthenticateUser"
+				"WebAuthenticateUser",
 				"GetOrderFee"
 			]
 			@response = {}
-			
+
 			@unsub_actions = []
 
 			alpha_self = self
@@ -55,7 +56,7 @@ module Alphapoint
 
 			trap(:INT) { EM.stop }
 			trap(:TERM){ EM.stop }
-			
+
 			while not EM.reactor_running?; end
 			while not EM.defers_finished?; end
 		end
@@ -87,7 +88,7 @@ module Alphapoint
 
 		def get_quotes(payload = { OMSId: 1 }, &block)
 			wait_handshake
-		
+
 			quotes = Alphapoint::GetQuotes.new(self)
 
 			quotes.execute(payload) do |res|
@@ -97,7 +98,7 @@ module Alphapoint
 
 		def method_missing(m, *args, &block)
 			wait_handshake
-			
+
 			function_name = m.to_s.camelcase
 			respond_action = @avaliable_functions.select{ |func| func ==  function_name }
 			if respond_action.size > 0
@@ -113,7 +114,7 @@ module Alphapoint
 				raise "Method #{m} not implemented yet"
 			end
 		end
-		
+
 		private
 			def wait_handshake
 				sleep(0.5)

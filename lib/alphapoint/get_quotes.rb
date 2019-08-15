@@ -12,11 +12,10 @@ module Alphapoint
 
 		def execute(payload, &block)
 			@ws.get_instruments(payload) do |res|
-
 				res.each do |inst|
 					payloadSub = payload.merge({ InstrumentId: inst['InstrumentId'] })
 					@ws.subscribe_level1(payloadSub) do |ticker|
-						if res.size == @count + 1
+						if res.size == @count
 							block.call(@data)
 						else
 							@data << ticker.merge(inst)

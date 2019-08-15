@@ -3,11 +3,12 @@ require 'faye/websocket'
 require 'eventmachine'
 require 'yaml'
 require 'active_support/all'
+require 'byebug'
 
 require 'alphapoint/configuration'
 require 'alphapoint/web_socket'
 require 'alphapoint/get_quotes'
-	
+
 module Alphapoint
 
 	module Call
