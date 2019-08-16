@@ -15,12 +15,9 @@ module Alphapoint
 				res.each do |inst|
 					payloadSub = payload.merge({ InstrumentId: inst['InstrumentId'] })
 					@ws.subscribe_level1(payloadSub) do |ticker|
-						if res.size == @count
-							block.call(@data)
-						else
-							@data << ticker.merge(inst)
-							@count += 1
-						end
+						@data << ticker.merge(inst)
+						@count += 1
+						block.call(@data) if res.size == @count
 					end
 				end
 			end
