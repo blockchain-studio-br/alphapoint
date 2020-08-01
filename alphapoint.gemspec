@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", "~> 5.1.6", ">= 5.1.6"
 
   spec.add_runtime_dependency "eventmachine",   "~> 1.2.7",  ">= 1.2.7"
-  spec.add_runtime_dependency "faye-websocket", "~> 0.10.7", ">= 0.10.7"
+  spec.add_runtime_dependency "faye-websocket", ">= 0.10.7", "< 0.12.0"
 
   spec.add_development_dependency "bundler", "~> 1.17"
   spec.add_development_dependency "rake", "~> 10.0"
